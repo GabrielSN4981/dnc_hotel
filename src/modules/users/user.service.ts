@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User } from 'generated/prisma/client';
 import { CreateUserDTO } from './domain/dto/createUser.dto';
 import { UpdateUserDTO } from './domain/dto/updateUser.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -18,15 +19,19 @@ export class UserService {
   }
 
   async create(body: CreateUserDTO): Promise<User> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    body.password = await this.hashPassword(body.password);
     return await this.prisma.user.create({ data: body });
   }
 
   async update(id: number, body: UpdateUserDTO): Promise<User> {
     await this.idExists(id);
+
+    if (body.password) {
+      body.password = await this.hashPassword(body.password);
+    }
+
     return await this.prisma.user.update({
       where: { id },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       data: body,
     });
   }
@@ -46,5 +51,9 @@ export class UserService {
     }
 
     return user;
+  }
+
+  private async hashPassword(password: string) {
+    return await bcrypt.hash(password, 10);
   }
 }
