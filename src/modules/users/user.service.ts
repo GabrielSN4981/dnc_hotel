@@ -49,6 +49,13 @@ export class UserService {
     return { message: 'User deleted successfully' };
   }
 
+  async findByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: { email },
+      select: userSelectFields,
+    });
+  }
+
   private async idExists(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
