@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from '../users/user.service';
 import { CreateUserDTO } from '../users/domain/dto/createUser.dto';
 import { AuthRegisterDTO } from './domain/dto/authRegister.dto';
+import { AuthResetPasswordDTO } from './domain/dto/authResetPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,18 @@ export class AuthService {
       role: body.role ?? Role.USER,
     };
     const user = await this.userService.create(newUser);
+    return await this.generateJwtToken(user);
+  }
+
+  async resetPassword({ token, password }: AuthResetPasswordDTO) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { valid, decoded } = await this.jwtService.verifyAsync(token);
+
+    if (!valid) throw new UnauthorizedException('Invalid token');
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    const user = await this.userService.update(decoded.sub, { password });
+
     return await this.generateJwtToken(user);
   }
 }
