@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { AuthLoginDTO } from './domain/dto/authLogin.dto';
 import { AuthRegisterDTO } from './domain/dto/authRegister.dto';
 import { AuthResetPasswordDTO } from './domain/dto/authResetPassword.dto';
+import { AuthForgotPasswordDTO } from './domain/dto/authForgotPassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,8 +27,13 @@ export class AuthController {
     return this.authService.register(body);
   }
 
-  @Patch('reset-password')
+  @Post('forgot')
+  forgotPassword(@Body() { email }: AuthForgotPasswordDTO) {
+    return this.authService.forgot(email);
+  }
+
+  @Patch('reset')
   resetPassword(@Body() { token, password }: AuthResetPasswordDTO) {
-    return this.authService.resetPassword({ token, password });
+    return this.authService.reset({ token, password });
   }
 }
