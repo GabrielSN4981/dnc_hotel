@@ -17,12 +17,15 @@ import { Role, type User as UserType } from 'generated/prisma/client';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { UserMatchGuard } from 'src/shared/guards/userMatch.guard';
+import { /* SkipThrottle */ Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
-@UseGuards(AuthGuard, RoleGuard)
+@UseGuards(AuthGuard, RoleGuard, ThrottlerGuard)
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  // @SkipThrottle()
+  @Throttle({ default: { ttl: 5000000, limit: 20 } })
   @Roles(Role.ADMIN)
   @Get()
   list(@User('email') user: UserType) {
