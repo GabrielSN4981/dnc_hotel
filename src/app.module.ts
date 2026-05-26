@@ -4,6 +4,7 @@ import { UserModule } from './modules/users/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -14,9 +15,15 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     ThrottlerModule.forRoot([
       {
         ttl: 5000,
-        limit: 1,
+        limit: 10,
       },
     ]),
+    MailerModule.forRoot({
+      transport: process.env.SMTP,
+      defaults: {
+        from: `'dnc-hotel' <${process.env.EMAIL_USER}>`,
+      },
+    }),
   ],
   providers: [
     {
