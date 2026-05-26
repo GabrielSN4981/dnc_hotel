@@ -73,7 +73,7 @@ export class AuthService {
     return token;
   }
 
-  private async validateToken(token: string): Promise<ValidateTokenDTO> {
+  async validateToken(token: string): Promise<ValidateTokenDTO> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const decoded = await this.jwtService.verifyAsync(token, {

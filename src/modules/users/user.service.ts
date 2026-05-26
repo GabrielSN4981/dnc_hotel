@@ -22,6 +22,12 @@ export class UserService {
   }
 
   async create(body: CreateUserDTO): Promise<User> {
+    const email = await this.findByEmail(body.email);
+
+    if (email) {
+      throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+    }
+
     body.password = await this.hashPassword(body.password);
     return await this.prisma.user.create({
       data: body,
@@ -30,6 +36,13 @@ export class UserService {
   }
 
   async update(id: number, body: UpdateUserDTO): Promise<User> {
+    if (body.email) {
+      const emailUser = await this.findByEmail(body.email);
+      if (emailUser && emailUser.id !== id) {
+        throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+      }
+    }
+
     await this.idExists(id);
 
     if (body.password) {
