@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   NotFoundException,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 export const User = createParamDecorator(
   (filter: string, context: ExecutionContext) => {
