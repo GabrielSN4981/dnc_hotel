@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HotelModule } from './modules/hotels/hotel.module';
+import { ReservationModule } from './modules/reservations/reservation.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HotelModule } from './modules/hotels/hotel.module';
       },
     }),
     HotelModule,
+    ReservationModule,
   ],
   providers: [
     {

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { HOTEL_REPOSITORY_TOKEN } from '../utils/repositoriesTokens';
+import { HOTEL_REPOSITORY_TOKEN } from 'src/shared/utils/repositoriesTokens';
 import type { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { UpdateHotelDto } from '../domain/dto/updateHotel.dto';
 
