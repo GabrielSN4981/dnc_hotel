@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { IReservationRepository } from '../domain/repositories/IReservation.repositories';
-import { CreateReservationDto } from '../domain/dto/create-reservation.dto';
 import { Reservation } from 'generated/prisma/client';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()
 export class ReservationRepository implements IReservationRepository {
-  create(data: CreateReservationDto): Promise<Reservation> {
-    throw new Error('');
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(data: any): Promise<Reservation> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    return this.prisma.reservation.create({ data });
+  }
+
+  findAll(): Promise<Reservation[]> {
+    return this.prisma.reservation.findMany();
+  }
+
+  findById(id: number): Promise<Reservation> {
+    return this.prisma.reservation.findUniqueOrThrow({ where: { id } });
+  }
+
+  findByUser(userId: number): Promise<Reservation[]> {
+    return this.prisma.reservation.findMany({ where: { userId } });
   }
 }
