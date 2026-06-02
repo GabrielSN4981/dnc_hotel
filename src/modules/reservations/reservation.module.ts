@@ -13,6 +13,8 @@ import { ReservationRepository } from './infra/reservations.repository';
 import { FindAllReservationService } from './services/findAllReservation.service';
 import { FindByIdReservationService } from './services/findByIdReservation.service';
 import { FindByUserReservationService } from './services/findByUserReservation.service';
+import { UpdateStatusReservationService } from './services/updateStatusReservation.service';
+import { HotelsRepositories } from '../hotels/infra/hotels.repository';
 
 @Module({
   imports: [PrismaModule, AuthModule, UserModule, HotelModule],
@@ -22,13 +24,14 @@ import { FindByUserReservationService } from './services/findByUserReservation.s
     FindAllReservationService,
     FindByIdReservationService,
     FindByUserReservationService,
+    UpdateStatusReservationService,
     {
       provide: RESERVATION_REPOSITORY_TOKEN,
       useClass: ReservationRepository,
     },
     {
       provide: HOTEL_REPOSITORY_TOKEN,
-      useClass: ReservationRepository,
+      useClass: HotelsRepositories,
     },
   ],
 })

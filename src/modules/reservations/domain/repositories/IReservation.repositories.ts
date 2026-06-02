@@ -1,4 +1,4 @@
-import { Reservation } from 'generated/prisma/client';
+import { Reservation, ReservationStatus } from 'generated/prisma/client';
 import { CreateReservationDto } from '../dto/create-reservation.dto';
 
 export interface IReservationRepository {
@@ -6,4 +6,5 @@ export interface IReservationRepository {
   findAll(): Promise<Reservation[]>;
   findById(id: number): Promise<Reservation>;
   findByUser(userId: number): Promise<Reservation[]>;
+  updateStatus(id: number, status: ReservationStatus): Promise<Reservation>;
 }

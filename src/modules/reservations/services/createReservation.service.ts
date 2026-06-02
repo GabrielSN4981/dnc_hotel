@@ -11,7 +11,7 @@ import {
 } from 'src/shared/utils/repositoriesTokens';
 import type { IReservationRepository } from '../domain/repositories/IReservation.repositories';
 import type { IHotelRepository } from 'src/modules/hotels/domain/repositories/IHotel.repositories';
-import { differenceInDays, parseISO } from 'date-fns';
+import { differenceInDays, isValid, parseISO } from 'date-fns';
 import { ReservationStatus } from 'generated/prisma/client';
 
 @Injectable()
@@ -27,6 +27,10 @@ export class CreateReservationService {
     const checkInDate = parseISO(data.checkIn);
     const checkOutDate = parseISO(data.checkOut);
     const daysOfStay = differenceInDays(checkInDate, checkOutDate);
+
+    if (!isValid(checkInDate) || !isValid(checkOutDate)) {
+      throw new BadRequestException('Invalid date format. Use YYYY-MM-DD.');
+    }
 
     if (checkInDate >= checkOutDate) {
       throw new BadRequestException(
