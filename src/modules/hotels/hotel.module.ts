@@ -7,7 +7,10 @@ import { UpdateHotelService } from './services/updateHotel.service';
 import { RemoveHotelService } from './services/removeHotel.service';
 import { HotelsRepositories } from './infra/hotels.repository';
 import { PrismaModule } from '../prisma/prisma.module';
-import { HOTEL_REPOSITORY_TOKEN } from 'src/shared/utils/repositoriesTokens';
+import {
+  HOTEL_REPOSITORY_TOKEN,
+  USER_REPOSITORY_TOKEN,
+} from 'src/shared/utils/repositoriesTokens';
 import { FindByNameHotelService } from './services/findByNameHotel.service';
 import { FindByOwnerHotelService } from './services/findByOwnerHotel.service';
 import { AuthModule } from '../auth/auth.module';
@@ -16,6 +19,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadImageHotelService } from './services/uploadImageHotel.service';
+import { UserRepositories } from '../users/infra/user.repository';
 
 @Module({
   imports: [
@@ -45,6 +49,10 @@ import { UploadImageHotelService } from './services/uploadImageHotel.service';
     {
       provide: HOTEL_REPOSITORY_TOKEN,
       useClass: HotelsRepositories,
+    },
+    {
+      provide: USER_REPOSITORY_TOKEN,
+      useClass: UserRepositories,
     },
   ],
 })

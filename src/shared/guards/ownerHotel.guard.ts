@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from 'src/modules/auth/auth.service';
+import { AuthService } from 'src/modules/auth/services/auth.service';
 import { FindOneHotelService } from 'src/modules/hotels/services/findOneHotel.service';
 
 @Injectable()

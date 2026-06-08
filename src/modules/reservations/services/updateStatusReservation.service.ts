@@ -3,7 +3,7 @@ import { RESERVATION_REPOSITORY_TOKEN } from 'src/shared/utils/repositoriesToken
 import type { IReservationRepository } from '../domain/repositories/IReservation.repositories';
 import { ReservationStatus } from 'generated/prisma/client';
 import { MailerService } from '@nestjs-modules/mailer';
-import { UserService } from 'src/modules/users/user.service';
+import { FindOneUserService } from 'src/modules/users/services/findOneUser.service';
 
 @Injectable()
 export class UpdateStatusReservationService {
@@ -11,12 +11,14 @@ export class UpdateStatusReservationService {
     @Inject(RESERVATION_REPOSITORY_TOKEN)
     private readonly reservationRepositories: IReservationRepository,
     private readonly mailerService: MailerService,
-    private readonly userService: UserService,
+    private readonly findOneUserService: FindOneUserService,
   ) {}
 
   async execute(id: number, status: ReservationStatus) {
     const reservation = this.reservationRepositories.updateStatus(id, status);
-    const user = await this.userService.show((await reservation).userId);
+    const user = await this.findOneUserService.execute(
+      (await reservation).userId,
+    );
 
     await this.mailerService.sendMail({
       to: user.email,

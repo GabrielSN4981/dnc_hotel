@@ -5,14 +5,22 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { UserController } from './infra/user.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserIdCheckMiddleware } from 'src/shared/middlewares/userIdCheck.middleware';
 import { AuthModule } from '../auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateUserService } from './services/createUser.service';
+import { UpdateUserService } from './services/updateUser.service';
+import { FindAllUsersService } from './services/findAllUsers.service';
+import { FindOneUserService } from './services/findOneUser.service';
+import { FindByEmailUserService } from './services/findByEmailUser.service';
+import { DeleteUserService } from './services/deleteUser.service';
+import { UploadAvatarUserService } from './services/uploadAvatarUser.service';
+import { USER_REPOSITORY_TOKEN } from 'src/shared/utils/repositoriesTokens';
+import { UserRepositories } from './infra/user.repository';
 
 @Module({
   imports: [
@@ -29,8 +37,25 @@ import { v4 as uuidv4 } from 'uuid';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService],
-  exports: [UserService],
+  providers: [
+    CreateUserService,
+    UpdateUserService,
+    FindAllUsersService,
+    FindOneUserService,
+    FindByEmailUserService,
+    DeleteUserService,
+    UploadAvatarUserService,
+    {
+      provide: USER_REPOSITORY_TOKEN,
+      useClass: UserRepositories,
+    },
+  ],
+  exports: [
+    CreateUserService,
+    UpdateUserService,
+    FindOneUserService,
+    FindByEmailUserService,
+  ],
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

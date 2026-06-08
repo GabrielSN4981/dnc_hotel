@@ -5,65 +5,89 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDTO } from './domain/dto/createUser.dto';
-import { UpdateUserDTO } from './domain/dto/updateUser.dto';
+import { CreateUserDTO } from '../domain/dto/createUser.dto';
+import { UpdateUserDTO } from '../domain/dto/updateUser.dto';
 import { ParamId } from 'src/shared/decorators/paramId.decorator';
 import { AuthGuard } from 'src/shared/guards/auth.guard';
 import { User } from 'src/shared/decorators/user.decorator';
-import { Role, type User as UserType } from 'generated/prisma/client';
+import { Role } from 'generated/prisma/client';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { UserMatchGuard } from 'src/shared/guards/userMatch.guard';
 import { /* SkipThrottle */ Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileValidationInterceptor } from 'src/shared/interceptors/fileValidation.interceptor';
+import { CreateUserService } from '../services/createUser.service';
+import { UpdateUserService } from '../services/updateUser.service';
+import { DeleteUserService } from '../services/deleteUser.service';
+import { FindAllUsersService } from '../services/findAllUsers.service';
+import { FindOneUserService } from '../services/findOneUser.service';
+import { FindByEmailUserService } from '../services/findByEmailUser.service';
+import { UploadAvatarUserService } from '../services/uploadAvatarUser.service';
 
 @UseGuards(AuthGuard, RoleGuard, ThrottlerGuard)
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private readonly createUserService: CreateUserService,
+    private readonly findAllUsersService: FindAllUsersService,
+    private readonly findOneUserService: FindOneUserService,
+    private readonly findByEmailUserService: FindByEmailUserService,
+    private readonly updateUserService: UpdateUserService,
+    private readonly deleteUserService: DeleteUserService,
+    private readonly uploadAvatarUserService: UploadAvatarUserService,
+  ) {}
 
   // @SkipThrottle()
   @Throttle({ default: { ttl: 5000000, limit: 20 } })
   @Roles(Role.ADMIN)
+  @Post()
+  create(@Body() body: CreateUserDTO) {
+    return this.createUserService.execute(body);
+  }
+
+  @Roles(Role.ADMIN)
   @Get()
-  list(@User('email') user: UserType) {
-    console.log(user);
-    return this.userService.list();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '3',
+  ) {
+    return this.findAllUsersService.execute(Number(page), Number(limit));
   }
 
   @Roles(Role.ADMIN)
   @Get(':id')
-  show(@ParamId() id: number) {
-    return this.userService.show(id);
+  findOne(@ParamId() id: number) {
+    return this.findOneUserService.execute(id);
   }
 
   @Roles(Role.ADMIN)
-  @Post()
-  create(@Body() body: CreateUserDTO) {
-    return this.userService.create(body);
+  @Get('email/:email')
+  findByEmail(@Param('email') email: string) {
+    return this.findByEmailUserService.execute(email);
   }
 
   @UseGuards(UserMatchGuard)
   @Roles(Role.ADMIN, Role.USER)
   @Patch(':id')
   update(@ParamId() id: number, @Body() body: UpdateUserDTO) {
-    return this.userService.update(id, body);
+    return this.updateUserService.execute(id, body);
   }
 
   @UseGuards(UserMatchGuard)
   @Roles(Role.ADMIN, Role.USER)
   @Delete(':id')
   delete(@ParamId() id: number) {
-    return this.userService.delete(id);
+    return this.deleteUserService.execute(id);
   }
 
   @UseInterceptors(FileInterceptor('avatar'), FileValidationInterceptor)
@@ -87,6 +111,8 @@ export class UserController {
     )
     avatar: Express.Multer.File,
   ) {
-    return this.userService.uploadAvatar(id, avatar.filename);
+    return this.uploadAvatarUserService.execute(id, {
+      avatar: avatar.filename,
+    });
   }
 }

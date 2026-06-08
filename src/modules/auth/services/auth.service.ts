@@ -1,22 +1,26 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { Role, User } from 'generated/prisma/client';
-import { AuthLoginDTO } from './domain/dto/authLogin.dto';
+import { AuthLoginDTO } from '../domain/dto/authLogin.dto';
 import * as bcrypt from 'bcrypt';
-import { UserService } from '../users/user.service';
-import { CreateUserDTO } from '../users/domain/dto/createUser.dto';
-import { AuthRegisterDTO } from './domain/dto/authRegister.dto';
-import { AuthResetPasswordDTO } from './domain/dto/authResetPassword.dto';
-import { ValidateTokenDTO } from './domain/dto/validateToken.dto';
+import { CreateUserDTO } from '../../users/domain/dto/createUser.dto';
+import { AuthRegisterDTO } from '../domain/dto/authRegister.dto';
+import { AuthResetPasswordDTO } from '../domain/dto/authResetPassword.dto';
+import { ValidateTokenDTO } from '../domain/dto/validateToken.dto';
 import { StringValue } from 'ms';
 import { MailerService } from '@nestjs-modules/mailer';
-import { templateHTML } from './utils/templateHTML';
+import { templateHTML } from '../utils/templateHTML';
+import { FindByEmailUserService } from 'src/modules/users/services/findByEmailUser.service';
+import { CreateUserService } from 'src/modules/users/services/createUser.service';
+import { UpdateUserService } from 'src/modules/users/services/updateUser.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService,
+    private readonly createUserService: CreateUserService,
+    private readonly updateUserService: UpdateUserService,
+    private readonly findByEmailUserService: FindByEmailUserService,
     private readonly mailerService: MailerService,
   ) {}
 
@@ -32,7 +36,7 @@ export class AuthService {
   }
 
   async login({ email, password }: AuthLoginDTO) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.findByEmailUserService.execute(email);
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid email or password');
@@ -48,7 +52,7 @@ export class AuthService {
       password: body.password,
       role: body.role ?? Role.USER,
     };
-    const user = await this.userService.create(newUser);
+    const user = await this.createUserService.execute(newUser);
     return await this.generateJwtToken(user);
   }
 
@@ -57,7 +61,7 @@ export class AuthService {
 
     if (!valid || !decoded) throw new UnauthorizedException('Invalid token');
 
-    const user = await this.userService.update(Number(decoded.sub), {
+    const user = await this.updateUserService.execute(Number(decoded.sub), {
       password,
     });
 
@@ -65,7 +69,7 @@ export class AuthService {
   }
 
   async forgot(email: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.findByEmailUserService.execute(email);
 
     if (!user) throw new UnauthorizedException('Email is incorrect');
 

@@ -5,14 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from 'src/modules/auth/auth.service';
-import { UserService } from 'src/modules/users/user.service';
+import { AuthService } from 'src/modules/auth/services/auth.service';
+import { FindOneUserService } from 'src/modules/users/services/findOneUser.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
+    private readonly findOneUserService: FindOneUserService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
 
     if (!valid) throw new UnauthorizedException('Invalid token');
 
-    const user = await this.userService.show(Number(decoded?.sub));
+    const user = await this.findOneUserService.execute(Number(decoded?.sub));
 
     if (!user) throw new UnauthorizedException('User not found');
 
