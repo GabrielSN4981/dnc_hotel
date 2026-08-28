@@ -7,6 +7,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HotelModule } from './modules/hotels/hotel.module';
 import { ReservationModule } from './modules/reservations/reservation.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -28,6 +29,10 @@ import { ReservationModule } from './modules/reservations/reservation.module';
     }),
     HotelModule,
     ReservationModule,
+    RedisModule.forRoot({
+      type: 'single',
+      url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    }),
   ],
   providers: [
     {
