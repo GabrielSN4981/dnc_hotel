@@ -110,7 +110,7 @@ export class HotelController {
           new MaxFileSizeValidator({
             // o tamanho maximo em KB será mudado se mudar o primeiro numero (ex: 100 * 1024 para 100KB)
             // para MB faça * 1024 novamente (ex: 2 * 1024 * 1024 para 2MB)
-            maxSize: 4 * 1024 * 1024, // 400KB
+            maxSize: 2 * 1024 * 1024,
           }),
         ],
       }),

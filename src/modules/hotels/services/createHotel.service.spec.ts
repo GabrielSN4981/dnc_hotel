@@ -3,9 +3,11 @@ import { CreateHotelService } from './createHotel.service';
 import { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { describe, beforeEach, it, expect, jest } from '@jest/globals';
 import { HOTEL_REPOSITORY_TOKEN } from '../../../shared/utils/repositoriesTokens';
+import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
 
 let service: CreateHotelService;
 let hotelRepository: IHotelRepository;
+let redis: { del: jest.Mock };
 
 const createHotelMock = {
   id: 1,
@@ -32,14 +34,29 @@ describe('CreateHotelService', () => {
             createHotel: jest.fn().mockResolvedValue(createHotelMock),
           },
         },
+        {
+          provide: 'default_IORedisModuleConnectionToken',
+          useValue: {
+            del: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<CreateHotelService>(CreateHotelService);
     hotelRepository = module.get<IHotelRepository>(HOTEL_REPOSITORY_TOKEN);
+    redis = module.get('default_IORedisModuleConnectionToken');
   });
   it('should be', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should delete the redis key', async () => {
+    const redisDelSpy = jest.spyOn(redis, 'del').mockResolvedValue(1);
+
+    await service.execute(createHotelMock, userIdMock);
+
+    expect(redisDelSpy).toHaveBeenCalledWith(REDIS_HOTEL_KEY);
   });
 
   it('should create a hotel', async () => {

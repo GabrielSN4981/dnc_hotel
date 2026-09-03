@@ -5,7 +5,7 @@ import { resolve, join } from 'path';
 import { stat, unlink } from 'fs/promises';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
-import { REDIS_HOTEL_KEY } from 'src/shared/utils/redisKey';
+import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
 
 @Injectable()
 export class UploadImageHotelService {

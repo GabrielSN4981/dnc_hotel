@@ -4,7 +4,7 @@ import type { IHotelRepository } from '../domain/repositories/IHotel.repositorie
 import { UpdateHotelDto } from '../domain/dto/updateHotel.dto';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
-import { REDIS_HOTEL_KEY } from 'src/shared/utils/redisKey';
+import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
 
 @Injectable()
 export class UpdateHotelService {

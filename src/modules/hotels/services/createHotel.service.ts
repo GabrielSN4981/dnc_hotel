@@ -4,7 +4,7 @@ import { HOTEL_REPOSITORY_TOKEN } from '../../../shared/utils/repositoriesTokens
 import type { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
-import { REDIS_HOTEL_KEY } from 'src/shared/utils/redisKey';
+import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
 
 @Injectable()
 export class CreateHotelService {

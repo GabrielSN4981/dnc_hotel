@@ -3,7 +3,8 @@ import { HOTEL_REPOSITORY_TOKEN } from '../../../shared/utils/repositoriesTokens
 import type { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
-import { REDIS_HOTEL_KEY } from 'src/shared/utils/redisKey';
+import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
+/* import { Hotel } from 'generated/prisma/client'; */
 
 @Injectable()
 export class FindAllHotelService {
@@ -23,6 +24,11 @@ export class FindAllHotelService {
 
     if (!data) {
       data = await this.hotelRepositories.findHotels(offSet, limit);
+      /* data = data.map((hotel: Hotel) => {
+        if (hotel.image) {
+          hotel.image = `${process.env.APP_API_URL}/hotel-image/${hotel.image}`;
+        }
+      }); */
       await this.redis.set(REDIS_HOTEL_KEY, JSON.stringify(data));
     }
 
