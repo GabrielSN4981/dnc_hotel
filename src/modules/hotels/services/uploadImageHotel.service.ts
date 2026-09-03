@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { HOTEL_REPOSITORY_TOKEN } from 'src/shared/utils/repositoriesTokens';
+import { HOTEL_REPOSITORY_TOKEN } from '../../../shared/utils/repositoriesTokens';
 import type { IHotelRepository } from '../domain/repositories/IHotel.repositories';
 import { resolve, join } from 'path';
 import { stat, unlink } from 'fs/promises';

@@ -7,7 +7,9 @@ import { REDIS_HOTEL_KEY } from '../../../shared/utils/redisKey';
 
 let service: CreateHotelService;
 let hotelRepository: IHotelRepository;
-let redis: { del: jest.Mock };
+let redis: {
+  del: jest.MockedFunction<(key: string) => Promise<number | null>>;
+};
 
 const createHotelMock = {
   id: 1,
@@ -31,13 +33,15 @@ describe('CreateHotelService', () => {
         {
           provide: HOTEL_REPOSITORY_TOKEN,
           useValue: {
-            createHotel: jest.fn().mockResolvedValue(createHotelMock),
+            createHotel: jest
+              .fn<IHotelRepository['createHotel']>()
+              .mockResolvedValue(createHotelMock),
           },
         },
         {
           provide: 'default_IORedisModuleConnectionToken',
           useValue: {
-            del: jest.fn(),
+            del: jest.fn<IHotelRepository['deleteHotel']>(),
           },
         },
       ],
